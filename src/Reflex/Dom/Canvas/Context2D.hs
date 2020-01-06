@@ -48,6 +48,7 @@ data CanvasF a
   | BeginPath a
   | MoveTo Double Double a
   | LineTo Double Double a
+  | LineWidth Float a
   | ClosePath a
   | StrokeStyle JSString a
   | Stroke a
@@ -85,6 +86,7 @@ applyInstruction cxt instruction =
     Fill rule cont             -> cont <$ C.fill cxt ( Just rule )
     FillRect x y w h cont      -> cont <$ C.fillRect cxt x y w h
     LineTo x y cont            -> cont <$ C.lineTo cxt x y
+    LineWidth width cont       -> cont <$ C.setLineWidth cxt width
     MoveTo x y cont            -> cont <$ C.moveTo cxt x y
     Rect x y w h cont          -> cont <$ C.rect cxt x y w h
     Stroke cont                -> cont <$ C.stroke cxt
@@ -128,7 +130,6 @@ applyInstruction cxt instruction =
     --  LineCap linecap cont                                  -> cont <$ C.lineCap linecap
     --  LineDashOffset offset cont                            -> cont <$ C.lineDashOffset offset
     --  LineJoin linejoin cont                                -> cont <$ C.lineJoin linejoin
-    --  LineWidth width cont                                  -> cont <$ C.lineWidth width
     --  MeasureText text cont                                 -> cont <$ C.measureText text
     --  MiterLimit limit cont                                 -> cont <$ C.miterLimit limit
     --  Rotate angle cont                                     -> cont <$ C.rotate angle
@@ -173,6 +174,9 @@ moveToF x y = liftF $ MoveTo x y ()
 
 lineToF :: Double -> Double -> CanvasM ()
 lineToF x y = liftF $ LineTo x y ()
+
+lineWidthF :: Float -> CanvasM ()
+lineWidthF width = liftF $ LineWidth width ()
 
 clearRectF, fillRectF, strokeRectF :: Float -> Float -> Float -> Float -> CanvasM ()
 clearRectF x y w h  = liftF $ ClearRect x y w h ()
