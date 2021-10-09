@@ -62,6 +62,7 @@ data CanvasF a
   | ClearRect Float Float Float Float a
   | StrokeRect Float Float Float Float a
 
+  | FillStyle JSString a
   | FillText JSString Float Float (Maybe Float) a
 
   | Done a
@@ -98,7 +99,9 @@ applyInstruction cxt instruction =
     ArcTo cp1_X cp1_Y cp2_X cp2_Y radius cont             -> cont <$ C.arcTo cxt cp1_X cp1_Y cp2_X cp2_Y radius
     BezierCurveTo cp1_X cp1_Y cp2_X cp2_Y endX endY cont  -> cont <$ C.bezierCurveTo cxt cp1_X cp1_Y cp2_X cp2_Y endX endY
     QuadraticCurveTo cpX cpY endX endY cont               -> cont <$ C.quadraticCurveTo cxt cpX cpY endX endY
-    FillText text x y maxWidth cont                                -> cont <$ C.fillText cxt text x y maxWidth
+
+    FillStyle style cont            -> cont <$ C.setFillStyle cxt style
+    FillText text x y maxWidth cont -> cont <$ C.fillText cxt text x y maxWidth
 
     -- DrawImage img dw dh cont                              -> cont <$ C.drawImage cxt img dw dh
 
@@ -192,6 +195,9 @@ arcF x y radius startAngle endAngle anticlockwise = liftF $ Arc x y radius start
 
 arcToF :: Double -> Double -> Double -> Double -> Double -> CanvasM ()
 arcToF cp1_X cp1_Y cp2_X cp2_Y radius = liftF $ ArcTo cp1_X cp1_Y cp2_X cp2_Y radius ()
+
+fillStyleF :: JSString -> CanvasM ()
+fillStyleF style = liftF $ FillStyle style ()
 
 fillTextF :: JSString -> Float -> Float -> Maybe Float -> CanvasM ()
 fillTextF s x y maxWidth = liftF $ FillText s x y maxWidth ()
