@@ -62,6 +62,7 @@ data CanvasF a
   | ClearRect Float Float Float Float a
   | StrokeRect Float Float Float Float a
 
+  | Font JSString a
   | FillStyle JSString a
   | FillText JSString Float Float (Maybe Float) a
 
@@ -100,6 +101,7 @@ applyInstruction cxt instruction =
     BezierCurveTo cp1_X cp1_Y cp2_X cp2_Y endX endY cont  -> cont <$ C.bezierCurveTo cxt cp1_X cp1_Y cp2_X cp2_Y endX endY
     QuadraticCurveTo cpX cpY endX endY cont               -> cont <$ C.quadraticCurveTo cxt cpX cpY endX endY
 
+    Font font' cont                 -> cont <$ C.setFont cxt font'
     FillStyle style cont            -> cont <$ C.setFillStyle cxt style
     FillText text x y maxWidth cont -> cont <$ C.fillText cxt text x y maxWidth
 
@@ -201,3 +203,6 @@ fillStyleF style = liftF $ FillStyle style ()
 
 fillTextF :: JSString -> Float -> Float -> Maybe Float -> CanvasM ()
 fillTextF s x y maxWidth = liftF $ FillText s x y maxWidth ()
+
+fontF :: JSString -> CanvasM ()
+fontF font' = liftF $ Font font' ()
